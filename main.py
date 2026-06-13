@@ -47,7 +47,7 @@ if certifi:
     os.environ.setdefault("REQUESTS_CA_BUNDLE", certifi.where())
     os.environ.setdefault("CURL_CA_BUNDLE", certifi.where())
 
-HOST = "127.0.0.1"
+HOST = os.getenv("HOST", "0.0.0.0")
 PORT = int(os.getenv("PORT", "5000"))
 HF_API_TOKEN = os.getenv("HF_API_TOKEN") or os.getenv("HF_TOKEN", "")
 HF_MODEL = os.getenv("HF_MODEL", "meta-llama/Llama-3.1-8B-Instruct")
