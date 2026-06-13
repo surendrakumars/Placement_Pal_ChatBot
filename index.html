@@ -71,6 +71,38 @@
     body, header, aside, main, div, section, button, textarea, input, select, table, tr, td, th {
       transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
     }
+
+    /* Responsive styling overrides */
+    @media (max-width: 768px) {
+      /* Stack comparative modifications table in Resume Optimizer */
+      #opt-modifications-table tr {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+        gap: 0.75rem;
+        border-bottom: 1px solid var(--color-outline-variant);
+        background: var(--color-surface);
+        border-radius: 12px;
+        margin-bottom: 1rem;
+      }
+      #opt-modifications-table td {
+        display: block;
+        padding: 0 !important;
+        width: 100% !important;
+        border-bottom: none !important;
+      }
+      #optimizer-loaded-state thead {
+        display: none;
+      }
+      
+      /* Make main wrapper padding slightly smaller on mobile */
+      main {
+        padding: 0.75rem !important;
+      }
+      .chat-container {
+        padding: 1rem !important;
+      }
+    }
   </style>
   <script id="tailwind-config">
     tailwind.config = {
@@ -120,6 +152,41 @@
         <h1 class="font-headline-md text-xl font-bold text-on-surface dark:text-slate-100">PlacementPal</h1>
         <p class="text-outline text-[12px] dark:text-slate-400">Your placement prep pal</p>
       </div>
+    </div>
+
+    <!-- Vertical Navigation for Desktop and Mobile Drawer -->
+    <div class="mb-8" id="sidebar-nav-container">
+      <h2 class="text-[11px] font-bold text-outline dark:text-slate-400 uppercase tracking-widest mb-3 px-1">Navigation</h2>
+      <nav class="space-y-1">
+        <button class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all text-outline hover:text-on-surface hover:bg-slate-50 dark:hover:bg-slate-800/40 dark:text-slate-400 dark:hover:text-slate-200 sidebar-tab" data-tab="chat" type="button">
+          <span class="material-symbols-outlined text-[20px]">forum</span>
+          <span>Chat</span>
+        </button>
+        <button class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all text-outline hover:text-on-surface hover:bg-slate-50 dark:hover:bg-slate-800/40 dark:text-slate-400 dark:hover:text-slate-200 sidebar-tab" data-tab="dashboard" type="button">
+          <span class="material-symbols-outlined text-[20px]">dashboard</span>
+          <span>Resume Dashboard</span>
+        </button>
+        <button class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all text-outline hover:text-on-surface hover:bg-slate-50 dark:hover:bg-slate-800/40 dark:text-slate-400 dark:hover:text-slate-200 sidebar-tab" data-tab="quiz" type="button">
+          <span class="material-symbols-outlined text-[20px]">edit_note</span>
+          <span>Aptitude Test</span>
+        </button>
+        <button class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all text-outline hover:text-on-surface hover:bg-slate-50 dark:hover:bg-slate-800/40 dark:text-slate-400 dark:hover:text-slate-200 sidebar-tab" data-tab="optimizer" type="button">
+          <span class="material-symbols-outlined text-[20px]">tune</span>
+          <span>Resume Optimizer</span>
+        </button>
+        <button class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all text-outline hover:text-on-surface hover:bg-slate-50 dark:hover:bg-slate-800/40 dark:text-slate-400 dark:hover:text-slate-200 sidebar-tab" data-tab="dsa-workspace" type="button">
+          <span class="material-symbols-outlined text-[20px]">code</span>
+          <span>DSA Playground</span>
+        </button>
+        <button class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all text-outline hover:text-on-surface hover:bg-slate-50 dark:hover:bg-slate-800/40 dark:text-slate-400 dark:hover:text-slate-200 sidebar-tab" data-tab="mock-interview" type="button">
+          <span class="material-symbols-outlined text-[20px]">record_voice_over</span>
+          <span>Mock Interview</span>
+        </button>
+        <button class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all text-outline hover:text-on-surface hover:bg-slate-50 dark:hover:bg-slate-800/40 dark:text-slate-400 dark:hover:text-slate-200 sidebar-tab" data-tab="company-hub" type="button">
+          <span class="material-symbols-outlined text-[20px]">business</span>
+          <span>Company Hub</span>
+        </button>
+      </nav>
     </div>
 
     <div class="mb-8">
@@ -203,16 +270,16 @@
           <span class="material-symbols-outlined text-on-surface dark:text-slate-200">menu</span>
         </button>
         <div class="flex items-center gap-2.5">
-          <span class="relative flex h-3 w-3">
+          <span class="relative flex h-3 w-3" id="header-status-dot">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
             <span class="relative inline-flex rounded-full h-3 w-3 bg-secondary"></span>
           </span>
-          <span class="font-semibold text-on-surface/80 dark:text-slate-300 text-sm">PlacementPal is ready to chat</span>
+          <span class="font-semibold text-on-surface/80 dark:text-slate-300 text-sm" id="header-title">PlacementPal Chat</span>
         </div>
       </div>
 
       <!-- Tabs -->
-      <div class="flex bg-slate-100 dark:bg-slate-850 p-1 rounded-xl overflow-x-auto scrollbar-none max-w-[50%] lg:max-w-[60%] select-none gap-0.5" id="tabs-container" style="scrollbar-width: none; -ms-overflow-style: none;">
+      <div class="hidden md:flex bg-slate-100 dark:bg-slate-850 p-1 rounded-xl overflow-x-auto scrollbar-none max-w-[50%] lg:max-w-[60%] select-none gap-0.5" id="tabs-container" style="scrollbar-width: none; -ms-overflow-style: none;">
         <button class="px-4 py-1.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-1.5 bg-white dark:bg-slate-700 text-primary shadow-sm whitespace-nowrap shrink-0" id="tab-chat" type="button">
           <span class="material-symbols-outlined text-[18px]">forum</span>
           Chat
@@ -917,7 +984,7 @@
 
               <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Left: Code Input Area (2 columns wide) -->
-                <div class="lg:col-span-2 flex flex-col h-[560px] bg-slate-950 rounded-2xl overflow-hidden border border-slate-850 shadow-lg relative">
+                <div class="lg:col-span-2 flex flex-col h-[380px] sm:h-[480px] lg:h-[560px] bg-slate-950 rounded-2xl overflow-hidden border border-slate-850 shadow-lg relative">
                   <div class="px-4 py-3 bg-slate-900 border-b border-slate-800/80 flex items-center justify-between shrink-0">
                     <span class="text-xs font-semibold text-slate-400 font-mono" id="dsa-editor-filename">solution.py</span>
                     <button id="dsa-reset-code" class="text-xs text-slate-400 hover:text-slate-200 font-semibold flex items-center gap-1">
@@ -945,7 +1012,7 @@
                 </div>
 
                 <!-- Right: Stdin & Terminal console (1 column wide) -->
-                <div class="flex flex-col gap-4 h-[560px]">
+                <div class="flex flex-col gap-4 h-[380px] sm:h-[480px] lg:h-[560px]">
                   <!-- Stdin area -->
                   <div class="flex flex-col h-[180px] bg-white dark:bg-slate-900 border border-outline-variant/40 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
                     <div class="flex items-center justify-between mb-2">
@@ -1485,6 +1552,16 @@
       }
     }
 
+    function closeSidebarOnMobile() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("sidebar-overlay");
+      if (sidebar && sidebar.classList.contains("translate-x-0")) {
+        sidebar.classList.remove("translate-x-0");
+        sidebar.classList.add("-translate-x-full");
+        if (overlay) overlay.classList.add("hidden");
+      }
+    }
+
     const messagesEl = document.querySelector("#messages");
     const chatEl = document.querySelector("#chat");
     const form = document.querySelector("#form");
@@ -1799,6 +1876,45 @@
           }
         }
       });
+
+      // Sync active vertical sidebar tabs
+      const sidebarTabs = document.querySelectorAll(".sidebar-tab");
+      sidebarTabs.forEach(btn => {
+        if (btn.dataset.tab === tab) {
+          btn.classList.add("bg-primary/10", "text-primary", "dark:bg-primary/15", "dark:text-blue-400");
+          btn.classList.remove("text-outline", "dark:text-slate-400");
+        } else {
+          btn.classList.remove("bg-primary/10", "text-primary", "dark:bg-primary/15", "dark:text-blue-400");
+          btn.classList.add("text-outline", "dark:text-slate-400");
+        }
+      });
+
+      // Dynamic header title update
+      const headerTitle = document.getElementById("header-title");
+      if (headerTitle) {
+        const titleMap = {
+          "chat": "PlacementPal Chat",
+          "dashboard": "Resume Dashboard",
+          "quiz": "Aptitude Quiz",
+          "optimizer": "Resume Optimizer",
+          "dsa-workspace": "DSA Playground",
+          "mock-interview": "Mock Interview",
+          "company-hub": "Company Hub"
+        };
+        headerTitle.textContent = titleMap[tab] || "PlacementPal";
+      }
+
+      // Context-aware Clear Chat button toggling
+      if (clear) {
+        if (tab === "chat") {
+          clear.classList.remove("hidden");
+        } else {
+          clear.classList.add("hidden");
+        }
+      }
+
+      // Close sidebar drawer on mobile transition
+      closeSidebarOnMobile();
 
       if (tab === "dashboard") {
         renderDashboard();
@@ -2721,7 +2837,10 @@
     });
 
     quickButtons.forEach((button) => {
-      button.addEventListener("click", () => sendMessage(button.dataset.prompt));
+      button.addEventListener("click", () => {
+        sendMessage(button.dataset.prompt);
+        closeSidebarOnMobile();
+      });
     });
 
     function openResumePicker() {
@@ -3972,6 +4091,11 @@ main();`
     tabDsaWorkspace.addEventListener("click", () => switchTab("dsa-workspace"));
     tabMockInterview.addEventListener("click", () => switchTab("mock-interview"));
     tabCompanyHub.addEventListener("click", () => switchTab("company-hub"));
+
+    // Register vertical sidebar tab click listeners
+    document.querySelectorAll(".sidebar-tab").forEach(btn => {
+      btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+    });
 
     render();
   </script>
