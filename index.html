@@ -1565,10 +1565,9 @@
     let resumeOptimization = null;
 
     function getBackendBaseUrl() {
-      const onBackend =
-        (location.hostname === "127.0.0.1" || location.hostname === "localhost") &&
-        location.port === "5000";
-      return onBackend ? "" : "http://127.0.0.1:5000";
+      // If running from local file system, point to local server.
+      // Otherwise, use relative path so it points to the current hosted domain.
+      return location.protocol === "file:" ? "http://127.0.0.1:5000" : "";
     }
 
     const baseUrl = getBackendBaseUrl();
