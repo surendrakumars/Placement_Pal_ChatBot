@@ -1380,7 +1380,8 @@ class ChatHandler(BaseHTTPRequestHandler):
 
 def main() -> None:
     server = ThreadingHTTPServer((HOST, PORT), ChatHandler)
-    print(f"PlacementPal is running at http://{HOST}:{PORT}")
+    display_host = "localhost" if HOST == "0.0.0.0" else HOST
+    print(f"PlacementPal is running at http://{display_host}:{PORT}")
     print("Press Ctrl+C to stop the server.")
     server.serve_forever()
 
