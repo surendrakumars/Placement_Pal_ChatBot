@@ -990,6 +990,252 @@ def generate_interview_evaluation(
     return call_llm(MOCK_EVAL_SYSTEM_PROMPT, user_prompt, temperature=0.3)
 
 
+ROADMAP_GENERATION_SYSTEM_PROMPT = """
+You are an expert career counselor and curriculum designer.
+Generate a structured career preparation roadmap for the targeted role and return a response strictly in valid JSON format.
+You must return only the JSON block. Do not include markdown code block syntax (like ```json), introduction, or follow-up notes.
+""".strip()
+
+ROADMAP_GENERATION_USER_PROMPT_TEMPLATE = """
+Generate a comprehensive, step-by-step career preparation roadmap for a candidate targeting the following role.
+Target Role: {role}
+
+Return a JSON object with this exact schema:
+{{
+  "role": "<the target role, e.g. Frontend Developer>",
+  "summary": "<a 2-3 sentence overview of the placement preparation roadmap for this role>",
+  "phases": [
+    {{
+      "phase_number": 1,
+      "title": "<title of the phase, e.g. Master the Programming Language>",
+      "duration": "<suggested time to spend, e.g. 3-4 Weeks>",
+      "description": "<a short 1-2 sentence summary of the main goal of this phase>",
+      "topics": [
+        "<core topic 1 to learn>",
+        "<core topic 2 to learn>",
+        "<core topic 3 to learn>",
+        "<core topic 4 to learn>"
+      ],
+      "skills": ["<skill badge 1>", "<skill badge 2>", "<skill badge 3>"]
+    }}
+  ]
+}}
+
+Provide exactly 4 or 5 logical phases in chronological order. Each phase should contain 3 to 5 clear, specific, actionable topics to master, and 2 to 4 key skills to acquire.
+""".strip()
+
+
+def wrap_text(text: str, max_chars: int) -> list[str]:
+    words = text.split(" ")
+    lines = []
+    current_line = []
+    current_length = 0
+    for word in words:
+        if current_length + len(word) + (1 if current_line else 0) <= max_chars:
+            current_line.append(word)
+            current_length += len(word) + (1 if current_line else 0)
+        else:
+            if current_line:
+                lines.append(" ".join(current_line))
+            current_line = [word]
+            current_length = len(word)
+    if current_line:
+        lines.append(" ".join(current_line))
+    return lines
+
+
+def escape_svg_text(text: str) -> str:
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;").replace("'", "&apos;")
+
+
+def generate_roadmap_data(role: str) -> str:
+    system_prompt = ROADMAP_GENERATION_SYSTEM_PROMPT
+    user_prompt = ROADMAP_GENERATION_USER_PROMPT_TEMPLATE.format(role=role)
+    return call_llm(system_prompt, user_prompt, temperature=0.4)
+
+
+def render_roadmap_svg(roadmap_data: dict[str, Any]) -> str:
+    role = roadmap_data.get("role", "Career")
+    phases = roadmap_data.get("phases", [])
+    
+    width = 800
+    padding_top = 40
+    padding_bottom = 40
+    header_height = 100
+    
+    y = padding_top + header_height
+    card_width = 620
+    card_x = 130
+    
+    phase_renders = []
+    
+    for idx, phase in enumerate(phases):
+        title = phase.get("title", "Learn Basics")
+        duration = phase.get("duration", "2-3 weeks")
+        description = phase.get("description", "")
+        topics = phase.get("topics", [])
+        skills = phase.get("skills", [])
+        
+        # Wrap description text
+        desc_lines = wrap_text(description, 70)
+        desc_line_count = len(desc_lines)
+        
+        # Calculate heights
+        topics_height = len(topics) * 20
+        
+        # Calculate tag wrapping height
+        tag_x = card_x + 24
+        tag_rows = 1
+        for skill in skills:
+            escaped_skill = escape_svg_text(skill)
+            tag_w = len(escaped_skill) * 7.5 + 16
+            if tag_x + tag_w > card_x + card_width - 24:
+                tag_rows += 1
+                tag_x = card_x + 24 + tag_w + 8
+            else:
+                tag_x += tag_w + 8
+                
+        skills_height = tag_rows * 28 if skills else 0
+        
+        card_h = 45 + (desc_line_count * 18) + (22 + topics_height if topics else 0) + (22 + skills_height if skills else 0) + 15
+        
+        phase_renders.append({
+            "idx": idx,
+            "title": title,
+            "duration": duration,
+            "desc_lines": desc_lines,
+            "topics": topics,
+            "skills": skills,
+            "card_h": card_h,
+            "y": y
+        })
+        
+        y += card_h + 40
+        
+    total_height = y + padding_bottom
+    
+    # SVG construction
+    svg = []
+    svg.append(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {total_height}" width="{width}" height="{total_height}" style="background-color: #0f172a; font-family: system-ui, -apple-system, sans-serif;">')
+    
+    # Defs
+    svg.append('<defs>')
+    svg.append('  <linearGradient id="bg-gradient" x1="0" y1="0" x2="0" y2="1">')
+    svg.append('    <stop offset="0%" stop-color="#0f172a"/>')
+    svg.append('    <stop offset="50%" stop-color="#1e293b"/>')
+    svg.append('    <stop offset="100%" stop-color="#0f172a"/>')
+    svg.append('  </linearGradient>')
+    
+    svg.append('  <linearGradient id="title-gradient" x1="0" y1="0" x2="1" y2="0">')
+    svg.append('    <stop offset="0%" stop-color="#38bdf8"/>')
+    svg.append('    <stop offset="50%" stop-color="#a855f7"/>')
+    svg.append('    <stop offset="100%" stop-color="#ec4899"/>')
+    svg.append('  </linearGradient>')
+    
+    svg.append('  <linearGradient id="line-gradient" x1="0" y1="0" x2="0" y2="1">')
+    svg.append('    <stop offset="0%" stop-color="#38bdf8"/>')
+    svg.append('    <stop offset="100%" stop-color="#a855f7"/>')
+    svg.append('  </linearGradient>')
+    
+    svg.append('  <linearGradient id="card-border" x1="0" y1="0" x2="1" y2="1">')
+    svg.append('    <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.6"/>')
+    svg.append('    <stop offset="100%" stop-color="#a855f7" stop-opacity="0.2"/>')
+    svg.append('  </linearGradient>')
+    
+    svg.append('  <filter id="card-shadow" x="-10%" y="-10%" width="120%" height="120%">')
+    svg.append('    <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#020617" flood-opacity="0.5"/>')
+    svg.append('  </filter>')
+    
+    svg.append('  <filter id="line-glow" x="-20%" y="-20%" width="140%" height="140%">')
+    svg.append('    <feGaussianBlur stdDeviation="3" result="blur"/>')
+    svg.append('    <feComposite in="SourceGraphic" in2="blur" operator="over"/>')
+    svg.append('  </filter>')
+    
+    svg.append('  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">')
+    svg.append('    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="0.5" stroke-opacity="0.15"/>')
+    svg.append('  </pattern>')
+    svg.append('</defs>')
+    
+    # Base background and grid
+    svg.append('<rect width="800" height="100%" fill="url(#bg-gradient)"/>')
+    svg.append(f'<rect width="800" height="{total_height}" fill="url(#grid)"/>')
+    
+    # Title
+    escaped_role = escape_svg_text(role)
+    svg.append(f'  <text x="70" y="70" font-size="28" font-weight="800" fill="url(#title-gradient)" letter-spacing="1">{escaped_role.upper()} PREP ROADMAP</text>')
+    svg.append('  <text x="70" y="95" font-size="14" font-weight="500" fill="#94a3b8">A structured preparation pathway designed by PlacementPal</text>')
+    
+    # Timeline line
+    if phase_renders:
+        last_y = phase_renders[-1]["y"] + phase_renders[-1]["card_h"] / 2
+        svg.append(f'  <line x1="70" y1="130" x2="70" y2="{last_y}" stroke="url(#line-gradient)" stroke-width="4" stroke-linecap="round" filter="url(#line-glow)"/>')
+        
+    for p in phase_renders:
+        idx = p["idx"]
+        card_y = p["y"]
+        card_h = p["card_h"]
+        
+        # Center of node dot on timeline
+        node_cy = card_y + 40
+        
+        # Node dot
+        svg.append(f'  <circle cx="70" cy="{node_cy}" r="22" fill="#0f172a" stroke="url(#line-gradient)" stroke-width="3" filter="url(#card-shadow)"/>')
+        svg.append(f'  <text x="70" y="{node_cy + 5}" font-size="14" font-weight="800" fill="#38bdf8" text-anchor="middle">{idx+1}</text>')
+        
+        # Connector dash line
+        svg.append(f'  <line x1="92" y1="{node_cy}" x2="130" y2="{node_cy}" stroke="#334155" stroke-width="2" stroke-dasharray="4 4"/>')
+        
+        # Card outline
+        svg.append(f'  <rect x="{card_x}" y="{card_y}" width="{card_width}" height="{card_h}" rx="16" fill="#0f172a" fill-opacity="0.85" stroke="url(#card-border)" stroke-width="1.5" filter="url(#card-shadow)"/>')
+        
+        # Title text
+        escaped_title = escape_svg_text(p["title"])
+        svg.append(f'  <text x="{card_x + 24}" y="{card_y + 32}" font-size="18" font-weight="700" fill="#f8fafc">Phase {idx+1}: {escaped_title}</text>')
+        
+        # Duration Badge
+        duration_text = p["duration"].upper()
+        badge_w = len(duration_text) * 7 + 16
+        badge_x = card_x + card_width - 24 - badge_w
+        badge_y = card_y + 16
+        svg.append(f'  <rect x="{badge_x}" y="{badge_y}" width="{badge_w}" height="24" rx="12" fill="#1e1b4b" stroke="#6366f1" stroke-width="1"/>')
+        svg.append(f'  <text x="{badge_x + badge_w / 2}" y="{badge_y + 16}" font-size="10" font-weight="700" fill="#a5b4fc" text-anchor="middle">{duration_text}</text>')
+        
+        # Render description lines
+        curr_y = card_y + 45
+        for line in p["desc_lines"]:
+            curr_y += 18
+            escaped_line = escape_svg_text(line)
+            svg.append(f'  <text x="{card_x + 24}" y="{curr_y}" font-size="13" font-weight="400" fill="#94a3b8">{escaped_line}</text>')
+            
+        # Topics
+        if p["topics"]:
+            curr_y += 22
+            svg.append(f'  <text x="{card_x + 24}" y="{curr_y}" font-size="11" font-weight="700" fill="#38bdf8" letter-spacing="0.5">KEY TOPICS</text>')
+            for topic in p["topics"]:
+                curr_y += 20
+                escaped_topic = escape_svg_text(topic)
+                svg.append(f'  <circle cx="{card_x + 30}" cy="{curr_y - 4}" r="3" fill="#a855f7"/>')
+                svg.append(f'  <text x="{card_x + 42}" y="{curr_y}" font-size="13" font-weight="500" fill="#cbd5e1">{escaped_topic}</text>')
+                
+        # Skills
+        if p["skills"]:
+            curr_y += 22
+            tag_x = card_x + 24
+            for skill in p["skills"]:
+                escaped_skill = escape_svg_text(skill)
+                tag_w = len(escaped_skill) * 7.5 + 16
+                if tag_x + tag_w > card_x + card_width - 24:
+                    curr_y += 28
+                    tag_x = card_x + 24
+                svg.append(f'  <rect x="{tag_x}" y="{curr_y}" width="{tag_w}" height="22" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>')
+                svg.append(f'  <text x="{tag_x + tag_w/2}" y="{curr_y + 15}" font-size="10" font-weight="600" fill="#38bdf8" text-anchor="middle">{escaped_skill}</text>')
+                tag_x += tag_w + 8
+                
+    svg.append('</svg>')
+    return "\n".join(svg)
+
+
+FRONTEND_DIST_DIR = os.path.join(os.path.dirname(__file__), "frontend", "dist")
 INDEX_HTML_PATH = os.path.join(os.path.dirname(__file__), "index.html")
 
 
@@ -1005,11 +1251,55 @@ class ChatHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self) -> None:
-        if self.path != "/":
-            self.send_error(404)
+        clean_path = urlparse(self.path).path.lstrip("/")
+        if not clean_path:
+            clean_path = "index.html"
+
+        if not os.path.exists(FRONTEND_DIST_DIR):
+            # Fallback to local old index.html at root if frontend/dist doesn't exist yet
+            if clean_path == "index.html":
+                if os.path.exists(INDEX_HTML_PATH):
+                    with open(INDEX_HTML_PATH, "r", encoding="utf-8") as file:
+                        self._send(200, file.read(), "text/html; charset=utf-8")
+                        return
+            self.send_error(404, "Frontend build directory not found. Please build the frontend first.")
             return
 
-        self._send(200, load_index_html(), "text/html; charset=utf-8")
+        # Serve static React built files
+        target_path = os.path.abspath(os.path.join(FRONTEND_DIST_DIR, clean_path))
+        if not target_path.startswith(os.path.abspath(FRONTEND_DIST_DIR)):
+            self.send_error(403, "Access Denied")
+            return
+
+        if os.path.exists(target_path) and os.path.isfile(target_path):
+            content_type = "application/octet-stream"
+            if target_path.endswith(".html"):
+                content_type = "text/html; charset=utf-8"
+            elif target_path.endswith(".js") or target_path.endswith(".mjs"):
+                content_type = "application/javascript; charset=utf-8"
+            elif target_path.endswith(".css"):
+                content_type = "text/css; charset=utf-8"
+            elif target_path.endswith(".json"):
+                content_type = "application/json; charset=utf-8"
+            elif target_path.endswith(".svg"):
+                content_type = "image/svg+xml; charset=utf-8"
+            elif target_path.endswith(".png"):
+                content_type = "image/png"
+            elif target_path.endswith(".jpg") or target_path.endswith(".jpeg"):
+                content_type = "image/jpeg"
+
+            try:
+                with open(target_path, "rb") as file:
+                    content = file.read()
+                self.send_response(200)
+                self._send_common_headers(content_type)
+                self.send_header("Content-Length", str(len(content)))
+                self.end_headers()
+                self.wfile.write(content)
+            except Exception as exc:
+                self.send_error(500, f"Error reading file: {str(exc)}")
+        else:
+            self.send_error(404, "File Not Found")
 
     def _request_path(self) -> str:
         return urlparse(self.path).path.rstrip("/") or "/"
@@ -1054,6 +1344,9 @@ class ChatHandler(BaseHTTPRequestHandler):
             return
         if path == "/api/evaluate-interview":
             self._handle_evaluate_interview()
+            return
+        if path == "/api/generate-roadmap":
+            self._handle_generate_roadmap()
             return
         self._send_json(404, {"error": f"Unknown API route: {path}"})
 
@@ -1351,6 +1644,30 @@ class ChatHandler(BaseHTTPRequestHandler):
                 raise ValueError("Model failed to return valid JSON evaluation. Please try again.") from parse_exc
                 
             self._send_json(200, {"evaluation": evaluation})
+        except Exception as exc:
+            self._send_json(500, {"error": str(exc)})
+
+    def _handle_generate_roadmap(self) -> None:
+        try:
+            payload = self._read_json_body()
+            role = payload.get("role", "").strip()
+            if not role:
+                raise ValueError("role field is required and cannot be empty")
+                
+            raw_response = generate_roadmap_data(role)
+            try:
+                roadmap_data = clean_and_parse_json(raw_response)
+            except Exception as parse_exc:
+                print(f"JSON Parsing failed for Roadmap: {raw_response}")
+                raise ValueError("Model failed to return valid JSON roadmap. Please try again.") from parse_exc
+                
+            svg_string = render_roadmap_svg(roadmap_data)
+            svg_base64 = base64.b64encode(svg_string.encode("utf-8")).decode("utf-8")
+            
+            self._send_json(200, {
+                "roadmap": roadmap_data,
+                "image": f"data:image/svg+xml;base64,{svg_base64}"
+            })
         except Exception as exc:
             self._send_json(500, {"error": str(exc)})
 
