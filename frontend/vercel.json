@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://your-python-backend-url.onrender.com/api/:path*"
+      "destination": "https://placement-pal-chatbot.onrender.com/api/:path*"
     }
   ]
 }
