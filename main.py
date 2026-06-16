@@ -121,11 +121,26 @@ def extract_pdf_text(pdf_bytes: bytes) -> str:
     except ImportError as exc:
         raise RuntimeError("Install pypdf to upload resumes: pip install pypdf") from exc
 
+    import re
+
     reader = PdfReader(io.BytesIO(pdf_bytes))
     pages: list[str] = []
     for page in reader.pages:
-        text = page.extract_text()
+        # Use layout mode to correctly parse multi-column resumes and keep layouts intact
+        try:
+            text = page.extract_text(extraction_mode="layout")
+        except Exception:
+            text = page.extract_text()
+            
         if text:
+            # Normalize smart/curly quotes
+            text = text.replace("“", '"').replace("”", '"').replace("‘", "'").replace("’", "'")
+            # Strip null bytes and non-printable control characters
+            text = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\xff]', '', text)
+            # Standardize excessive spacing while preserving layout indentation (cap at 4 spaces)
+            text = re.sub(r'[ \t]{5,}', '    ', text)
+            # Remove excessive consecutive newlines (reduce 3+ newlines to just 2)
+            text = re.sub(r'\n{3,}', '\n\n', text)
             pages.append(text.strip())
 
     result = "\n\n".join(pages).strip()
