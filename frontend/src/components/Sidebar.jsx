@@ -129,8 +129,16 @@ function Sidebar({
       >
         {/* Title / Logo header */}
         <div className="flex items-center gap-3 mb-10 shrink-0">
-          <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-primary/20">
-            PP
+          <div className="w-12 h-12 bg-gradient-to-tr from-primary to-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 relative overflow-hidden group">
+            {/* Shimmer effect */}
+            <div className="absolute inset-0 w-[200%] h-[200%] bg-gradient-to-br from-white/25 via-transparent to-transparent -translate-x-[70%] -translate-y-[70%] rotate-45 transition-transform duration-1000 group-hover:translate-x-[25%] group-hover:translate-y-[25%]"></div>
+            {/* Graduation Cap logo emblem */}
+            <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" fill="currentColor" fillOpacity="0.2" />
+              <path d="M6 10v6c0 2 2.5 3 6 3s6-1 6-3v-6" />
+              <path d="M22 7v7" />
+              <circle cx="12" cy="13" r="1.2" fill="currentColor" />
+            </svg>
           </div>
           <div className="flex flex-col">
             <h1 className="font-headline-md text-xl font-bold text-on-surface dark:text-slate-100">
