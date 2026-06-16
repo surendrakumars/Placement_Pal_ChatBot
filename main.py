@@ -1054,6 +1054,21 @@ def generate_roadmap_data(role: str) -> str:
     return call_llm(system_prompt, user_prompt, temperature=0.4)
 
 
+def get_phase_icon_path(phase_idx: int, cx: float, cy: float) -> str:
+    # 0-indexed phase icons
+    if phase_idx == 0:  # Code block </>
+        return f'<path d="M {cx-4} {cy-3} l -3 3 l 3 3 M {cx+4} {cy-3} l 3 3 l -3 3 M {cx+1} {cy-5} l -2 10" stroke="#38bdf8" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+    elif phase_idx == 1:  # Server/DNS (3 cylinders stack)
+        return f'<path d="M {cx-5} {cy-4} h 10 v 3 h -10 z M {cx-5} {cy} h 10 v 3 h -10 z M {cx-5} {cy+4} h 10 v 3 h -10 z" stroke="#a855f7" stroke-width="1.5" fill="none" stroke-linecap="round"/>'
+    elif phase_idx == 2:  # Tools (gear-like shape)
+        return f'<circle cx="{cx}" cy="{cy}" r="3" stroke="#ec4899" stroke-width="1.5" fill="none"/>' \
+               f'<path d="M {cx} {cy-5} v 2 M {cx} {cy+3} v 2 M {cx-5} {cy} h 2 M {cx+3} {cy} h 2" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round"/>'
+    elif phase_idx == 3:  # Trophy
+        return f'<path d="M {cx-4} {cy-4} h 8 v 5 c 0 2 -2 4 -4 4 s -4 -2 -4 -4 z M {cx} {cy+5} v 3 M {cx-3} {cy+8} h 6 M {cx-4} {cy-2} h -2 v 2 c 0 1 1 1 2 1 M {cx+4} {cy-2} h 2 v 2 c 0 1 -1 1 -2 1" stroke="#eab308" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+    else:  # Star
+        return f'<path d="M {cx} {cy-5} l 1.5 3 h 3.5 l -2.5 2 l 1 3.5 l -3.5 -2 l -3.5 2 l 1 -3.5 l -2.5 -2 h 3.5 z" stroke="#22c55e" stroke-width="1.5" fill="none" stroke-linejoin="round"/>'
+
+
 def render_roadmap_svg(roadmap_data: dict[str, Any]) -> str:
     role = roadmap_data.get("role", "Career")
     phases = roadmap_data.get("phases", [])
@@ -1072,45 +1087,35 @@ def render_roadmap_svg(roadmap_data: dict[str, Any]) -> str:
     for idx, phase in enumerate(phases):
         title = phase.get("title", "Learn Basics")
         duration = phase.get("duration", "2-3 weeks")
-        description = phase.get("description", "")
-        topics = phase.get("topics", [])
         skills = phase.get("skills", [])
         
-        # Wrap description text
-        desc_lines = wrap_text(description, 70)
-        desc_line_count = len(desc_lines)
-        
-        # Calculate heights
-        topics_height = len(topics) * 20
-        
-        # Calculate tag wrapping height
-        tag_x = card_x + 24
+        # Calculate skills tags row count to wrap tags if they exceed card width
+        tag_x = card_x + 64
         tag_rows = 1
         for skill in skills:
             escaped_skill = escape_svg_text(skill)
             tag_w = len(escaped_skill) * 7.5 + 16
             if tag_x + tag_w > card_x + card_width - 24:
                 tag_rows += 1
-                tag_x = card_x + 24 + tag_w + 8
+                tag_x = card_x + 64 + tag_w + 8
             else:
                 tag_x += tag_w + 8
                 
         skills_height = tag_rows * 28 if skills else 0
         
-        card_h = 45 + (desc_line_count * 18) + (22 + topics_height if topics else 0) + (22 + skills_height if skills else 0) + 15
+        # Compact visual height:
+        card_h = 50 + (10 + skills_height if skills else 0) + 15
         
         phase_renders.append({
             "idx": idx,
             "title": title,
             "duration": duration,
-            "desc_lines": desc_lines,
-            "topics": topics,
             "skills": skills,
             "card_h": card_h,
             "y": y
         })
         
-        y += card_h + 40
+        y += card_h + 30
         
     total_height = y + padding_bottom
     
@@ -1163,7 +1168,7 @@ def render_roadmap_svg(roadmap_data: dict[str, Any]) -> str:
     # Title
     escaped_role = escape_svg_text(role)
     svg.append(f'  <text x="70" y="70" font-size="28" font-weight="800" fill="url(#title-gradient)" letter-spacing="1">{escaped_role.upper()} PREP ROADMAP</text>')
-    svg.append('  <text x="70" y="95" font-size="14" font-weight="500" fill="#94a3b8">A structured preparation pathway designed by PlacementPal</text>')
+    svg.append('  <text x="70" y="95" font-size="14" font-weight="500" fill="#94a3b8">A visual career preparation timeline designed by PlacementPal</text>')
     
     # Timeline line
     if phase_renders:
@@ -1176,57 +1181,48 @@ def render_roadmap_svg(roadmap_data: dict[str, Any]) -> str:
         card_h = p["card_h"]
         
         # Center of node dot on timeline
-        node_cy = card_y + 40
+        node_cy = card_y + card_h / 2
         
         # Node dot
-        svg.append(f'  <circle cx="70" cy="{node_cy}" r="22" fill="#0f172a" stroke="url(#line-gradient)" stroke-width="3" filter="url(#card-shadow)"/>')
+        svg.append(f'  <circle cx="70" cy="{node_cy}" r="20" fill="#0f172a" stroke="url(#line-gradient)" stroke-width="3" filter="url(#card-shadow)"/>')
         svg.append(f'  <text x="70" y="{node_cy + 5}" font-size="14" font-weight="800" fill="#38bdf8" text-anchor="middle">{idx+1}</text>')
         
         # Connector dash line
-        svg.append(f'  <line x1="92" y1="{node_cy}" x2="130" y2="{node_cy}" stroke="#334155" stroke-width="2" stroke-dasharray="4 4"/>')
+        svg.append(f'  <line x1="90" y1="{node_cy}" x2="130" y2="{node_cy}" stroke="#334155" stroke-width="2" stroke-dasharray="4 4"/>')
         
         # Card outline
         svg.append(f'  <rect x="{card_x}" y="{card_y}" width="{card_width}" height="{card_h}" rx="16" fill="#0f172a" fill-opacity="0.85" stroke="url(#card-border)" stroke-width="1.5" filter="url(#card-shadow)"/>')
         
-        # Title text
+        # Circular Icon Badge inside the card
+        icon_cx = card_x + 36
+        icon_cy = card_y + 32
+        svg.append(f'  <circle cx="{icon_cx}" cy="{icon_cy}" r="16" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5" stroke-opacity="0.7"/>')
+        
+        # Render dynamic vector icon based on phase number
+        svg.append(f'  {get_phase_icon_path(idx, icon_cx, icon_cy)}')
+        
+        # Title text (pushed right due to icon)
         escaped_title = escape_svg_text(p["title"])
-        svg.append(f'  <text x="{card_x + 24}" y="{card_y + 32}" font-size="18" font-weight="700" fill="#f8fafc">Phase {idx+1}: {escaped_title}</text>')
+        svg.append(f'  <text x="{card_x + 64}" y="{card_y + 37}" font-size="16" font-weight="700" fill="#f8fafc">Phase {idx+1}: {escaped_title}</text>')
         
         # Duration Badge
         duration_text = p["duration"].upper()
         badge_w = len(duration_text) * 7 + 16
         badge_x = card_x + card_width - 24 - badge_w
-        badge_y = card_y + 16
+        badge_y = card_y + 20
         svg.append(f'  <rect x="{badge_x}" y="{badge_y}" width="{badge_w}" height="24" rx="12" fill="#1e1b4b" stroke="#6366f1" stroke-width="1"/>')
         svg.append(f'  <text x="{badge_x + badge_w / 2}" y="{badge_y + 16}" font-size="10" font-weight="700" fill="#a5b4fc" text-anchor="middle">{duration_text}</text>')
         
-        # Render description lines
-        curr_y = card_y + 45
-        for line in p["desc_lines"]:
-            curr_y += 18
-            escaped_line = escape_svg_text(line)
-            svg.append(f'  <text x="{card_x + 24}" y="{curr_y}" font-size="13" font-weight="400" fill="#94a3b8">{escaped_line}</text>')
-            
-        # Topics
-        if p["topics"]:
-            curr_y += 22
-            svg.append(f'  <text x="{card_x + 24}" y="{curr_y}" font-size="11" font-weight="700" fill="#38bdf8" letter-spacing="0.5">KEY TOPICS</text>')
-            for topic in p["topics"]:
-                curr_y += 20
-                escaped_topic = escape_svg_text(topic)
-                svg.append(f'  <circle cx="{card_x + 30}" cy="{curr_y - 4}" r="3" fill="#a855f7"/>')
-                svg.append(f'  <text x="{card_x + 42}" y="{curr_y}" font-size="13" font-weight="500" fill="#cbd5e1">{escaped_topic}</text>')
-                
-        # Skills
+        # Skills tags
         if p["skills"]:
-            curr_y += 22
-            tag_x = card_x + 24
+            curr_y = card_y + 58
+            tag_x = card_x + 64
             for skill in p["skills"]:
                 escaped_skill = escape_svg_text(skill)
                 tag_w = len(escaped_skill) * 7.5 + 16
                 if tag_x + tag_w > card_x + card_width - 24:
                     curr_y += 28
-                    tag_x = card_x + 24
+                    tag_x = card_x + 64
                 svg.append(f'  <rect x="{tag_x}" y="{curr_y}" width="{tag_w}" height="22" rx="6" fill="#1e293b" stroke="#334155" stroke-width="1"/>')
                 svg.append(f'  <text x="{tag_x + tag_w/2}" y="{curr_y + 15}" font-size="10" font-weight="600" fill="#38bdf8" text-anchor="middle">{escaped_skill}</text>')
                 tag_x += tag_w + 8
