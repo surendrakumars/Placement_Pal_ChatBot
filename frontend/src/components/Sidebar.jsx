@@ -278,14 +278,7 @@ function Sidebar({
           </nav>
         </div>
 
-        {/* Standalone backend info details */}
-        <div className="mt-auto pt-10 border-t border-outline-variant/20 shrink-0">
-          <p className="text-xs text-outline dark:text-slate-400 leading-relaxed italic">
-            Real chatbot mode uses the backend at <strong>/api/chat</strong>. Configure{" "}
-            <strong>OPENAI_API_KEY</strong> or <strong>USE_OLLAMA=1</strong>, then run{" "}
-            <strong>main.py</strong>.
-          </p>
-        </div>
+
       </aside>
 
       {/* Mobile Sidebar Overlay */}
