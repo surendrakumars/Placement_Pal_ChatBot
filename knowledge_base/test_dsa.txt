@@ -1,0 +1,4 @@
+Data Structures:
+- Binary Search Trees (BST): Left child is smaller, right child is larger than node.
+- Graphs: Represented via adjacency lists or matrices.
+- Dynamic Programming (DP): Solve subproblems and cache results (Memoization / Tabulation).

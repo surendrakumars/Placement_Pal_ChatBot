@@ -1,0 +1,53 @@
+{
+  "chunks": [
+    {
+      "id": "test_placement.txt_0",
+      "filename": "test_placement.txt",
+      "text": "Placement Preparation Guide:\n1. Resume preparation: Focus on projects, internship experience, and key technical skills.\n2. Coding rounds: Practice Data Structures and Algorithms (DSA) including Arrays, Strings, Trees, and Dynamic Programming.\n3. HR Interview: Prepare standard questions like 'Tell me about yourself' and 'Why do you want to join our company?'."
+    },
+    {
+      "id": "PlacementPal_Knowledge_Base.pdf_0",
+      "filename": "PlacementPal_Knowledge_Base.pdf",
+      "text": "PlacementPal Knowledge Base\n\nThis document serves as a compact knowledge base for PlacementPal, covering the core areas\nrequired for campus placements, internships, and software engineering interviews.\n\n1. Aptitude Topics\n\nPercentages, Profit & Loss, Ratio & Proportion, Time & Work, Pipes & Cisterns, Speed Time\nDistance, Permutations & Combinations, Probability, Number Systems, HCF & LCM, Averages,\nSimple & Compound Interest, Data Interpretation, Logical Reasoning, Puzzles, Seating\nArrangement, Blood Relations, Direction Sense, Coding-Decoding, Syllogisms, Calendars, and\nClocks."
+    },
+    {
+      "id": "PlacementPal_Knowledge_Base.pdf_1",
+      "filename": "PlacementPal_Knowledge_Base.pdf",
+      "text": "ng, Puzzles, Seating\nArrangement, Blood Relations, Direction Sense, Coding-Decoding, Syllogisms, Calendars, and\nClocks.\n2. Data Structures & Algorithms\n\nArrays, Strings, Hashing, Linked Lists, Stacks, Queues, Recursion, Binary Search, Sliding Window,\nTwo Pointers, Prefix Sum, Trees, Binary Trees, BST, Heaps, Graphs, Dynamic Programming,\nGreedy Algorithms, Backtracking, Tries, Union Find, and Advanced Graph Algorithms.\n3. Core Computer Science\n\nDBMS: Normalization, SQL Queries, Indexing, Transactions, ACID. Operating Systems: Processes,"
+    },
+    {
+      "id": "PlacementPal_Knowledge_Base.pdf_2",
+      "filename": "PlacementPal_Knowledge_Base.pdf",
+      "text": "3. Core Computer Science\n\nDBMS: Normalization, SQL Queries, Indexing, Transactions, ACID. Operating Systems: Processes,\nThreads, Scheduling, Deadlocks, Memory Management. Computer Networks: OSI Model, TCP/IP,\nHTTP, DNS, Routing, Subnetting. OOP: Encapsulation, Inheritance, Polymorphism, Abstraction,\nSOLID Principles.\n4. Development Knowledge\n\nFrontend: HTML, CSS, JavaScript, React. Backend: Node.js, Express. Databases: MongoDB,\nPostgreSQL, MySQL. APIs: REST, Authentication, JWT. Version Control: Git, GitHub. Cloud: AWS\nFundamentals.\n5. Interview Preparation"
+    },
+    {
+      "id": "PlacementPal_Knowledge_Base.pdf_3",
+      "filename": "PlacementPal_Knowledge_Base.pdf",
+      "text": "ySQL. APIs: REST, Authentication, JWT. Version Control: Git, GitHub. Cloud: AWS\nFundamentals.\n5. Interview Preparation\n\nPrepare project explanations, STAR-based behavioral answers, resume walkthrough, strengths\nand weaknesses, leadership examples, conflict resolution stories, and internship/project\nexperiences.\n6. Company Assessment Strategy\n\nService-based companies: Aptitude + Basic Coding + Communication. Product-based companies:\nDSA + CS Fundamentals + Projects. Focus on timed mock tests and interview simulations.\n7. Revision Checklist"
+    },
+    {
+      "id": "PlacementPal_Knowledge_Base.pdf_4",
+      "filename": "PlacementPal_Knowledge_Base.pdf",
+      "text": "ompanies:\nDSA + CS Fundamentals + Projects. Focus on timed mock tests and interview simulations.\n7. Revision Checklist\n\nSolve 150+ DSA problems, revise SQL, DBMS, OS, CN, OOP, complete aptitude practice, prepare\nproject demos, update resume and GitHub, and practice mock interviews."
+    },
+    {
+      "id": "test_dsa.txt_0",
+      "filename": "test_dsa.txt",
+      "text": "Data Structures:\n- Binary Search Trees (BST): Left child is smaller, right child is larger than node.\n- Graphs: Represented via adjacency lists or matrices.\n- Dynamic Programming (DP): Solve subproblems and cache results (Memoization / Tabulation)."
+    }
+  ],
+  "metadata": {
+    "PlacementPal_Knowledge_Base.pdf": {
+      "size": 3801,
+      "modified": 1781765188275
+    },
+    "test_placement.txt": {
+      "size": 361,
+      "modified": 1781765113567
+    },
+    "test_dsa.txt": {
+      "size": 249,
+      "modified": 1781765227877
+    }
+  }
+}

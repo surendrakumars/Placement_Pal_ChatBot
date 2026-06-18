@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import ChatView from "./components/ChatView";
+import KnowledgeBaseView from "./components/KnowledgeBaseView";
 import DashboardView from "./components/DashboardView";
 import AptitudeQuizView from "./components/AptitudeQuizView";
 import ResumeOptimizerView from "./components/ResumeOptimizerView";
@@ -130,7 +131,10 @@ function App() {
       });
       const data = await parseJsonResponse(response);
       if (!response.ok) throw new Error(data.error || "Request failed");
-      setHistory((prev) => [...prev, { role: "assistant", content: data.reply }]);
+      setHistory((prev) => [
+        ...prev,
+        { role: "assistant", content: data.reply, sources: data.sources }
+      ]);
     } catch (error) {
       setHistory((prev) => [
         ...prev,
@@ -187,6 +191,9 @@ function App() {
                 isPending={isPending}
                 fetchResumeAnalysis={fetchResumeAnalysis}
               />
+            )}
+            {currentTab === "knowledge-base" && (
+              <KnowledgeBaseView />
             )}
             {currentTab === "dashboard" && (
               <DashboardView

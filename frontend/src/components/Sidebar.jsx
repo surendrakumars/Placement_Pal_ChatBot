@@ -22,6 +22,7 @@ function Sidebar({
 
   const navItems = [
     { id: "chat", label: "Chat", icon: "forum" },
+    { id: "knowledge-base", label: "Knowledge Base", icon: "folder_open" },
     { id: "dashboard", label: "Resume Dashboard", icon: "dashboard" },
     { id: "roadmap", label: "Career Roadmap", icon: "route" },
     { id: "quiz", label: "Aptitude Test", icon: "edit_note" },

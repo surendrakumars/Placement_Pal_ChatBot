@@ -63,6 +63,32 @@ MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", str(5 * 1024 * 1024)))
 SAVED_CODES_DIR = os.path.join(os.path.dirname(__file__), "saved_codes")
 os.makedirs(SAVED_CODES_DIR, exist_ok=True)
 
+from rag import RAGManager
+rag_manager = RAGManager()
+
+def get_rag_config() -> dict[str, Any]:
+    kb_dir = os.path.join(os.path.dirname(__file__), "knowledge_base")
+    os.makedirs(kb_dir, exist_ok=True)
+    config_path = os.path.join(kb_dir, "config.json")
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {"enabled": True, "strategy": "bm25", "top_k": 3}
+
+def save_rag_config(config: dict[str, Any]) -> None:
+    kb_dir = os.path.join(os.path.dirname(__file__), "knowledge_base")
+    os.makedirs(kb_dir, exist_ok=True)
+    config_path = os.path.join(kb_dir, "config.json")
+    try:
+        with open(config_path, "w", encoding="utf-8") as f:
+            json.dump(config, f, indent=2)
+    except Exception:
+        pass
+
+
 PLACEMENT_ASSISTANT_ROLE = """
 You are PlacementPal, a warm, conversational placement-prep pal.
 Your role is to help students prepare for campus placements, internships, and
@@ -103,16 +129,33 @@ When reviewing, planning prep, or doing mock interviews, tailor recommendations 
 """.strip()
 
 
-def build_system_prompt(resume_text: str | None = None) -> str:
-    if not resume_text:
-        return PLACEMENT_ASSISTANT_ROLE
-
-    trimmed_resume = resume_text.strip()[:MAX_RESUME_CHARS]
-    return (
-        f"{PLACEMENT_ASSISTANT_ROLE}\n\n"
-        f"{RESUME_CONTEXT_INSTRUCTIONS}\n\n"
-        f"Student resume:\n{trimmed_resume}"
-    )
+def build_system_prompt(resume_text: str | None = None, rag_chunks: list[dict[str, Any]] | None = None) -> str:
+    prompt = PLACEMENT_ASSISTANT_ROLE
+    if resume_text:
+        trimmed_resume = resume_text.strip()[:MAX_RESUME_CHARS]
+        prompt = (
+            f"{prompt}\n\n"
+            f"{RESUME_CONTEXT_INSTRUCTIONS}\n\n"
+            f"Student resume:\n{trimmed_resume}"
+        )
+    
+    if rag_chunks:
+        context_parts = []
+        for chunk in rag_chunks:
+            context_parts.append(
+                f"[Source Document: {chunk['filename']}]\n"
+                f"{chunk['text']}"
+            )
+        rag_context_str = "\n\n".join(context_parts)
+        prompt = (
+            f"{prompt}\n\n"
+            f"Relevant context retrieved from placement preparation files:\n"
+            f"Use this reference information to assist the candidate. If this information is helpful, "
+            f"mention the source filename to support your answers. "
+            f"If the answer cannot be found in the context, use your general knowledge, but give precedence to the provided facts.\n\n"
+            f"{rag_context_str}"
+        )
+    return prompt
 
 
 def extract_pdf_text(pdf_bytes: bytes) -> str:
@@ -151,9 +194,13 @@ def extract_pdf_text(pdf_bytes: bytes) -> str:
     return result
 
 
-def build_prompt(messages: list[dict[str, str]], resume_text: str | None = None) -> str:
+def build_prompt(
+    messages: list[dict[str, str]],
+    resume_text: str | None = None,
+    rag_chunks: list[dict[str, Any]] | None = None,
+) -> str:
     """Create a single prompt for model APIs that expect plain text."""
-    conversation = [f"System: {build_system_prompt(resume_text)}"]
+    conversation = [f"System: {build_system_prompt(resume_text, rag_chunks)}"]
     for message in messages[-12:]:
         role = "Student" if message.get("role") == "user" else "PlacementPal"
         content = message.get("content", "").strip()
@@ -166,6 +213,7 @@ def build_prompt(messages: list[dict[str, str]], resume_text: str | None = None)
 def generate_with_your_model(
     messages: list[dict[str, str]],
     resume_text: str | None = None,
+    rag_chunks: list[dict[str, Any]] | None = None,
 ) -> str:
     """
     Generate a real model response.
@@ -175,20 +223,15 @@ def generate_with_your_model(
     - OpenAI: set OPENAI_API_KEY. Optional: set OPENAI_MODEL.
     - Ollama: run Ollama locally and set USE_OLLAMA=1. Optional: set OLLAMA_MODEL.
     - Custom model: replace this function body with your own model call.
-
-    Custom model example:
-        prompt = build_prompt(messages)
-        response = your_model.generate(prompt)
-        return response
     """
     if HF_API_TOKEN:
-        return generate_with_hf(messages, resume_text)
+        return generate_with_hf(messages, resume_text, rag_chunks)
 
     if os.getenv("OPENAI_API_KEY"):
-        return generate_with_openai(messages, resume_text)
+        return generate_with_openai(messages, resume_text, rag_chunks)
 
     if os.getenv("USE_OLLAMA") == "1":
-        return generate_with_ollama(messages, resume_text)
+        return generate_with_ollama(messages, resume_text, rag_chunks)
 
     raise RuntimeError(
         "No model is configured. Set HF_API_TOKEN for Hugging Face, set OPENAI_API_KEY "
@@ -200,11 +243,12 @@ def generate_with_your_model(
 def generate_with_hf(
     messages: list[dict[str, str]],
     resume_text: str | None = None,
+    rag_chunks: list[dict[str, Any]] | None = None,
 ) -> str:
     if not HF_API_URL:
-        return generate_with_hf_inference_client(messages, resume_text)
+        return generate_with_hf_inference_client(messages, resume_text, rag_chunks)
 
-    prompt = build_prompt(messages, resume_text)
+    prompt = build_prompt(messages, resume_text, rag_chunks)
     payload = {
         "inputs": prompt,
         "parameters": {
@@ -236,6 +280,7 @@ def generate_with_hf(
 def generate_with_hf_inference_client(
     messages: list[dict[str, str]],
     resume_text: str | None = None,
+    rag_chunks: list[dict[str, Any]] | None = None,
 ) -> str:
     try:
         from huggingface_hub import InferenceClient
@@ -249,7 +294,7 @@ def generate_with_hf_inference_client(
     completion = client.chat.completions.create(
         model=HF_MODEL,
         messages=[
-            {"role": "system", "content": build_system_prompt(resume_text)},
+            {"role": "system", "content": build_system_prompt(resume_text, rag_chunks)},
             *[
                 {"role": message["role"], "content": message["content"]}
                 for message in messages[-20:]
@@ -276,10 +321,11 @@ def generate_with_hf_inference_client(
 def generate_with_openai(
     messages: list[dict[str, str]],
     resume_text: str | None = None,
+    rag_chunks: list[dict[str, Any]] | None = None,
 ) -> str:
     payload = {
         "model": OPENAI_MODEL,
-        "instructions": build_system_prompt(resume_text),
+        "instructions": build_system_prompt(resume_text, rag_chunks),
         "input": [
             {"role": message["role"], "content": message["content"]}
             for message in messages[-20:]
@@ -309,8 +355,9 @@ def generate_with_openai(
 def generate_with_ollama(
     messages: list[dict[str, str]],
     resume_text: str | None = None,
+    rag_chunks: list[dict[str, Any]] | None = None,
 ) -> str:
-    prompt = build_prompt(messages, resume_text)
+    prompt = build_prompt(messages, resume_text, rag_chunks)
     payload = {
         "model": OLLAMA_MODEL,
         "prompt": prompt,
@@ -321,6 +368,7 @@ def generate_with_ollama(
     if isinstance(reply, str) and reply.strip():
         return reply.strip()
     raise RuntimeError("Ollama returned an empty response.")
+
 
 
 def post_json(
@@ -1359,6 +1407,18 @@ class ChatHandler(BaseHTTPRequestHandler):
         if path == "/api/generate-roadmap":
             self._handle_generate_roadmap()
             return
+        if path == "/api/rag/list":
+            self._handle_rag_list()
+            return
+        if path == "/api/rag/upload":
+            self._handle_rag_upload()
+            return
+        if path == "/api/rag/delete":
+            self._handle_rag_delete()
+            return
+        if path == "/api/rag/settings":
+            self._handle_rag_settings()
+            return
         self._send_json(404, {"error": f"Unknown API route: {path}"})
 
     def _read_json_body(self) -> dict[str, Any]:
@@ -1387,8 +1447,99 @@ class ChatHandler(BaseHTTPRequestHandler):
                 if role in {"user", "assistant"} and content:
                     cleaned_messages.append({"role": role, "content": content})
 
-            reply = generate_with_your_model(cleaned_messages, resume_text)
-            self._send_json(200, {"reply": reply})
+            # Retrieve RAG context if enabled
+            rag_chunks = []
+            config = get_rag_config()
+            if config.get("enabled", True) and cleaned_messages:
+                last_user_msg = next((m["content"] for m in reversed(cleaned_messages) if m["role"] == "user"), "")
+                if last_user_msg:
+                    try:
+                        rag_chunks = rag_manager.query(
+                            last_user_msg,
+                            top_k=config.get("top_k", 3),
+                            strategy=config.get("strategy", "bm25"),
+                            env_vars=dict(os.environ)
+                        )
+                    except Exception as e:
+                        print(f"RAG query failed: {e}")
+
+            reply = generate_with_your_model(cleaned_messages, resume_text, rag_chunks)
+
+            # Extract source references for citations
+            sources = []
+            if rag_chunks:
+                seen = set()
+                for chunk in rag_chunks:
+                    fname = chunk["filename"]
+                    if fname not in seen:
+                        seen.add(fname)
+                        sources.append({
+                            "filename": fname,
+                            "score": chunk.get("score")
+                        })
+
+            self._send_json(200, {"reply": reply, "sources": sources})
+        except Exception as exc:
+            self._send_json(500, {"error": str(exc)})
+
+    def _handle_rag_list(self) -> None:
+        try:
+            files = rag_manager.list_files()
+            config = get_rag_config()
+            self._send_json(200, {"files": files, "config": config})
+        except Exception as exc:
+            self._send_json(500, {"error": str(exc)})
+
+    def _handle_rag_upload(self) -> None:
+        try:
+            payload = self._read_json_body()
+            filename = str(payload.get("filename", "")).strip()
+            if not filename:
+                raise ValueError("filename is required")
+
+            encoded = str(payload.get("data", "")).strip()
+            if not encoded:
+                raise ValueError("File data is missing")
+
+            file_bytes = base64.b64decode(encoded, validate=True)
+            res = rag_manager.add_file(filename, file_bytes, dict(os.environ))
+            self._send_json(200, {"success": True, "file": res})
+        except Exception as exc:
+            self._send_json(500, {"error": str(exc)})
+
+    def _handle_rag_delete(self) -> None:
+        try:
+            payload = self._read_json_body()
+            filename = str(payload.get("filename", "")).strip()
+            if not filename:
+                raise ValueError("filename is required")
+
+            success = rag_manager.delete_file(filename)
+            self._send_json(200, {"success": success})
+        except Exception as exc:
+            self._send_json(500, {"error": str(exc)})
+
+    def _handle_rag_settings(self) -> None:
+        try:
+            payload = self._read_json_body()
+            config = get_rag_config()
+
+            if "enabled" in payload:
+                config["enabled"] = bool(payload["enabled"])
+            if "strategy" in payload:
+                strategy = str(payload["strategy"]).strip().lower()
+                if strategy in ["bm25", "embeddings"]:
+                    config["strategy"] = strategy
+            if "top_k" in payload:
+                try:
+                    top_k = int(payload["top_k"])
+                    if 1 <= top_k <= 10:
+                        config["top_k"] = top_k
+                except (ValueError, TypeError):
+                    pass
+
+            save_rag_config(config)
+            self._send_json(200, {"success": True, "config": config})
         except Exception as exc:
             self._send_json(500, {"error": str(exc)})
 
@@ -1707,11 +1858,20 @@ class ChatHandler(BaseHTTPRequestHandler):
 
 
 def main() -> None:
+    try:
+        rag_manager.scan_and_rebuild(dict(os.environ))
+        files = rag_manager.list_files()
+        total_chunks = len(rag_manager.chunks)
+        print(f"Knowledge base loaded successfully: {len(files)} files, {total_chunks} total chunks indexed.")
+    except Exception as e:
+        print(f"Warning: Could not index knowledge base at startup: {e}")
+
     server = ThreadingHTTPServer((HOST, PORT), ChatHandler)
     display_host = "localhost" if HOST == "0.0.0.0" else HOST
     print(f"PlacementPal is running at http://{display_host}:{PORT}")
     print("Press Ctrl+C to stop the server.")
     server.serve_forever()
+
 
 
 if __name__ == "__main__":

@@ -1,0 +1,4 @@
+Placement Preparation Guide:
+1. Resume preparation: Focus on projects, internship experience, and key technical skills.
+2. Coding rounds: Practice Data Structures and Algorithms (DSA) including Arrays, Strings, Trees, and Dynamic Programming.
+3. HR Interview: Prepare standard questions like 'Tell me about yourself' and 'Why do you want to join our company?'.

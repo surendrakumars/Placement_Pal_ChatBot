@@ -142,10 +142,27 @@ function ChatView({
                       {msg.content}
                     </p>
                   ) : (
-                    <div
-                      className="assistant-content font-chat-bubble text-[15px] leading-relaxed"
-                      dangerouslySetInnerHTML={{ __html: markdownToHtml(msg.content) }}
-                    />
+                    <>
+                      <div
+                        className="assistant-content font-chat-bubble text-[15px] leading-relaxed"
+                        dangerouslySetInnerHTML={{ __html: markdownToHtml(msg.content) }}
+                      />
+                      {msg.sources && msg.sources.length > 0 && (
+                        <div className="mt-3 pt-2.5 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center gap-1.5 text-[11px] text-outline font-semibold">
+                          <span className="material-symbols-outlined text-[14px]">menu_book</span>
+                          <span>Sources:</span>
+                          {msg.sources.map((src, sIdx) => (
+                            <span
+                              key={sIdx}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700 text-primary"
+                              title={src.score ? `Relevance: ${(src.score * 100).toFixed(0)}%` : ""}
+                            >
+                              {src.filename}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
