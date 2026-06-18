@@ -1,0 +1,79 @@
+**Building a High-Scoring Resume for Entry-Level Software Engineering and Technology Placement Roles**
+
+**Resume Structure**
+
+A well-structured resume is essential to effectively showcase your skills, experience, and achievements to potential employers. The following sections should be included in your resume:
+
+1. **Contact Information**
+	* Full name
+	* Email address
+	* Phone number
+	* LinkedIn profile (or other professional social media handles)
+	* Personal website or blog (if applicable)
+2. **Summary/Objective**
+	* A brief overview of your background, skills, and career goals (1-2 sentences)
+	* Tailor your summary to the specific job you're applying for
+3. **Education**
+	* Degree(s) earned (Bachelor's, Master's, Ph.D., etc.)
+	* Institution(s) attended
+	* Relevant coursework or specializations
+	* Date(s) of graduation
+4. **Experience**
+	* List relevant work experience, internships, or projects in reverse chronological order
+	* Use action verbs (see below) to describe your responsibilities and achievements
+	* Quantify your achievements using metrics (see below)
+5. **Projects**
+	* List personal or academic projects that demonstrate your skills and experience
+	* Include a brief description of the project, your role, and any notable achievements
+6. **Skills**
+	* List relevant programming languages, tools, and technologies
+	* Include any relevant certifications or licenses
+
+**Action Verbs**
+
+Using action verbs is essential to describe your responsibilities and achievements in a clear and concise manner. Some examples of action verbs include:
+
+* Managed
+* Created
+* Developed
+* Designed
+* Implemented
+* Improved
+* Increased
+* Enhanced
+* Maintained
+* Collaborated
+
+**Quantifying Achievements**
+
+Quantifying your achievements using metrics is crucial to demonstrate the impact of your work. Some examples of metrics include:
+
+* "Improved code quality by 30% through the implementation of automated testing and code review processes."
+* "Reduced project timeline by 25% through the optimization of development processes and resource allocation."
+* "Increased user engagement by 50% through the development of a new feature and its successful deployment."
+
+**Tips for Writing a High-Scoring Resume**
+
+1. **Tailor your resume to the job**: Customize your resume for each job you apply to by highlighting the skills and experiences that match the job requirements.
+2. **Use specific examples**: Use specific examples to demonstrate your skills and experiences, rather than making generic claims.
+3. **Use action verbs**: Use action verbs to describe your responsibilities and achievements.
+4. **Quantify your achievements**: Use metrics to demonstrate the impact of your work.
+5. **Keep it concise**: Keep your resume concise and easy to read by using bullet points and clear headings.
+6. **Proofread**: Proofread your resume multiple times to ensure there are no errors in grammar, spelling, or formatting.
+
+**Common Mistakes to Avoid**
+
+1. **Generic summaries**: Avoid using generic summaries that don't provide any specific information about your background, skills, or career goals.
+2. **Lack of metrics**: Avoid making claims about your achievements without providing any metrics to support them.
+3. **Typos and grammatical errors**: Avoid typos and grammatical errors, as they can make a negative impression on the reader.
+4. **Irrelevant information**: Avoid including irrelevant information, such as hobbies or personal interests, unless they are directly related to the job.
+5. **Overemphasis on education**: Avoid overemphasizing your education, as it's not the only factor that determines your qualifications for a job.
+6. **Lack of relevant experience**: Avoid applying for jobs without relevant experience or skills, as it can make it difficult to get hired.
+
+**Additional Tips**
+
+1. **Use a standard font**: Use a standard font, such as Arial, Calibri or Helvetica, to make your resume easy to read.
+2. **Use bullet points**: Use bullet points to break up large blocks of text and make your resume easier to read.
+3. **Use a clear and concise format**: Use a clear and concise format to make your resume easy to read and understand.
+4. **Include relevant certifications**: Include any relevant certifications or licenses to demonstrate your expertise.
+5. **Get feedback**: Get feedback from friends, family, or a career counselor to ensure your resume is effective and well-written.

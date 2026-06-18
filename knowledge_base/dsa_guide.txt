@@ -1,0 +1,140 @@
+**Data Structures and Algorithms (DSA) Reference Guide**
+
+**Introduction**
+
+Data Structures and Algorithms (DSA) are the building blocks of computer science. They are used to efficiently store and manipulate data in computer programs. In this guide, we will cover the key concepts, definitions, operations, and time complexities of various data structures and algorithms that are commonly used in campus placement prep.
+
+**Arrays**
+
+* **Definition:** An array is a collection of elements of the same data type stored in contiguous memory locations.
+* **Key Operations:**
+	+ Accessing an element: O(1)
+	+ Inserting an element: O(n)
+	+ Deleting an element: O(n)
+* **Time Complexities:**
+	+ Accessing an element: O(1)
+	+ Searching for an element: O(n)
+	+ Sorting an array: O(n log n)
+
+**Linked Lists**
+
+* **Definition:** A linked list is a dynamic collection of elements where each element points to the next element in the list.
+* **Key Operations:**
+	+ Accessing an element: O(n)
+	+ Inserting an element: O(1)
+	+ Deleting an element: O(1)
+* **Time Complexities:**
+	+ Accessing an element: O(n)
+	+ Searching for an element: O(n)
+	+ Sorting a linked list: O(n^2)
+
+**Stacks**
+
+* **Definition:** A stack is a Last-In-First-Out (LIFO) data structure that follows the principle of last element added is the first one to be removed.
+* **Key Operations:**
+	+ Push: O(1)
+	+ Pop: O(1)
+	+ Peek: O(1)
+* **Time Complexities:**
+	+ Push: O(1)
+	+ Pop: O(1)
+	+ Peek: O(1)
+
+**Queues**
+
+* **Definition:** A queue is a First-In-First-Out (FIFO) data structure that follows the principle of first element added is the first one to be removed.
+* **Key Operations:**
+	+ Enqueue: O(1)
+	+ Dequeue: O(1)
+	+ Peek: O(1)
+* **Time Complexities:**
+	+ Enqueue: O(1)
+	+ Dequeue: O(1)
+	+ Peek: O(1)
+
+**Binary Trees**
+
+* **Definition:** A binary tree is a tree data structure in which each node has at most two children (i.e., left child and right child).
+* **Key Operations:**
+	+ Insertion: O(h)
+	+ Deletion: O(h)
+	+ Search: O(h)
+* **Time Complexities:**
+	+ Insertion: O(h)
+	+ Deletion: O(h)
+	+ Search: O(h)
+
+**Balanced Binary Search Trees (BSTs)**
+
+* **Definition:** A balanced binary search tree is a binary tree where the height of the left and right subtrees of every node differs by at most one.
+* **Key Operations:**
+	+ Insertion: O(log n)
+	+ Deletion: O(log n)
+	+ Search: O(log n)
+* **Time Complexities:**
+	+ Insertion: O(log n)
+	+ Deletion: O(log n)
+	+ Search: O(log n)
+
+**Graphs**
+
+* **Definition:** A graph is a non-linear data structure consisting of nodes or vertices connected by edges.
+* **Key Operations:**
+	+ Insertion: O(|E| + |V|)
+	+ Deletion: O(|E| + |V|)
+	+ Search: O(|E| + |V|)
+* **Time Complexities:**
+	+ Insertion: O(|E| + |V|)
+	+ Deletion: O(|E| + |V|)
+	+ Search: O(|E| + |V|)
+
+**Hash Tables**
+
+* **Definition:** A hash table is a data structure that stores key-value pairs in an array using a hash function to map keys to indices.
+* **Key Operations:**
+	+ Insertion: O(1)
+	+ Deletion: O(1)
+	+ Search: O(1)
+* **Time Complexities:**
+	+ Insertion: O(1)
+	+ Deletion: O(1)
+	+ Search: O(1)
+
+**Common Algorithm Patterns**
+
+### Two Pointers
+
+* **Definition:** The two pointers technique involves using two pointers that move towards each other to solve a problem.
+* **Example:** Finding the intersection of two sorted arrays.
+
+### Sliding Window
+
+* **Definition:** The sliding window technique involves moving a window of fixed size over an array to solve a problem.
+* **Example:** Finding the maximum sum of a subarray of size k.
+
+### Recursion
+
+* **Definition:** Recursion is a programming technique where a function calls itself to solve a problem.
+* **Example:** Finding the factorial of a number.
+
+### Binary Search
+
+* **Definition:** Binary search is a search algorithm that finds an element in a sorted array by dividing the array in half.
+* **Example:** Finding an element in a sorted array.
+
+### Dynamic Programming
+
+* **Definition:** Dynamic programming is a programming technique where a problem is broken down into smaller subproblems and solved recursively.
+* **Example:** Finding the longest common subsequence of two strings.
+
+**Practice Tips**
+
+* Practice solving problems on platforms like LeetCode, HackerRank, and CodeForces.
+* Start with basic problems and gradually move to more complex ones.
+* Focus on understanding the problem statement and the algorithm used to solve it.
+* Use a whiteboard or a piece of paper to visualize the problem and the algorithm.
+* Practice coding and debugging regularly.
+
+**Conclusion**
+
+Data Structures and Algorithms are the building blocks of computer science. In this guide, we covered the key concepts, definitions, operations, and time complexities of various data structures and algorithms. We also discussed common algorithm patterns like Two Pointers, Sliding Window, Recursion, Binary Search, and Dynamic Programming. Practice is key to mastering these concepts, so make sure to practice regularly and solve problems on platforms like LeetCode, HackerRank, and CodeForces.

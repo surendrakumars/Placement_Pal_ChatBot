@@ -1,0 +1,126 @@
+**Quantitative Aptitude and Logical Reasoning Reference Guide**
+
+**Section 1: Percentages**
+
+* **Formulas:**
+	+ Percentage increase/decrease: (New Value - Old Value) / Old Value * 100
+	+ Percentage of a number: (Number * Percentage) / 100
+* **Shortcuts:**
+	+ To find the percentage increase/decrease, first find the difference and then divide by the original value.
+	+ To find the percentage of a number, multiply the number by the percentage and divide by 100.
+* **Quick Guide:**
+	+ To find the percentage increase/decrease, use the formula: (New Value - Old Value) / Old Value * 100
+	+ To find the percentage of a number, use the formula: (Number * Percentage) / 100
+
+**Section 2: Profit & Loss**
+
+* **Formulas:**
+	+ Cost Price (CP): The price at which an item is purchased
+	+ Selling Price (SP): The price at which an item is sold
+	+ Profit: SP - CP
+	+ Loss: CP - SP
+	+ Profit Percentage: (Profit / CP) * 100
+	+ Loss Percentage: (Loss / CP) * 100
+* **Shortcuts:**
+	+ To find the profit or loss, subtract the CP from the SP.
+	+ To find the profit percentage, divide the profit by the CP and multiply by 100.
+	+ To find the loss percentage, divide the loss by the CP and multiply by 100.
+* **Quick Guide:**
+	+ To find the profit or loss, use the formula: SP - CP
+	+ To find the profit percentage, use the formula: (Profit / CP) * 100
+	+ To find the loss percentage, use the formula: (Loss / CP) * 100
+
+**Section 3: Simple & Compound Interest**
+
+* **Formulas:**
+	+ Simple Interest (SI): (Principal * Rate * Time) / 100
+	+ Compound Interest (CI): P * (1 + R/100)^n - P
+	+ Where:
+		- P: Principal amount
+		- R: Rate of interest
+		- n: Time period
+* **Shortcuts:**
+	+ To find the SI, multiply the principal, rate, and time, and divide by 100.
+	+ To find the CI, use the formula: P * (1 + R/100)^n - P
+* **Quick Guide:**
+	+ To find the SI, use the formula: (Principal * Rate * Time) / 100
+	+ To find the CI, use the formula: P * (1 + R/100)^n - P
+
+**Section 4: Ratio & Proportion**
+
+* **Formulas:**
+	+ Ratio: A set of numbers in a particular order, separated by a colon (:)
+	+ Proportion: A statement that two ratios are equal
+	+ Cross-multiplication: (a * b) = (c * d)
+* **Shortcuts:**
+	+ To find the ratio, list the numbers in a particular order, separated by a colon (:)
+	+ To find the proportion, use the formula: (a * b) = (c * d)
+* **Quick Guide:**
+	+ To find the ratio, use the formula: a:b:c:d
+	+ To find the proportion, use the formula: (a * b) = (c * d)
+
+**Section 5: Time & Work**
+
+* **Formulas:**
+	+ Work done = (Work rate * Time)
+	+ Work rate = Work done / Time
+* **Shortcuts:**
+	+ To find the work done, multiply the work rate and time.
+	+ To find the work rate, divide the work done by the time.
+* **Quick Guide:**
+	+ To find the work done, use the formula: Work rate * Time
+	+ To find the work rate, use the formula: Work done / Time
+
+**Section 6: Speed-Time-Distance**
+
+* **Formulas:**
+	+ Speed = Distance / Time
+	+ Distance = Speed * Time
+	+ Time = Distance / Speed
+* **Shortcuts:**
+	+ To find the speed, divide the distance by the time.
+	+ To find the distance, multiply the speed and time.
+	+ To find the time, divide the distance by the speed.
+* **Quick Guide:**
+	+ To find the speed, use the formula: Distance / Time
+	+ To find the distance, use the formula: Speed * Time
+	+ To find the time, use the formula: Distance / Speed
+
+**Section 7: Probability**
+
+* **Formulas:**
+	+ Probability = (Number of favorable outcomes) / (Total number of outcomes)
+* **Shortcuts:**
+	+ To find the probability, divide the number of favorable outcomes by the total number of outcomes.
+* **Quick Guide:**
+	+ To find the probability, use the formula: (Number of favorable outcomes) / (Total number of outcomes)
+
+**Section 8: Permutations & Combinations**
+
+* **Formulas:**
+	+ Permutation: nPr = n! / (n-r)!
+	+ Combination: nCr = n! / (r!(n-r)!)
+	+ Where:
+		- n: Total number of items
+		- r: Number of items to be chosen
+* **Shortcuts:**
+	+ To find the permutation, use the formula: nPr = n! / (n-r)!
+	+ To find the combination, use the formula: nCr = n! / (r!(n-r)!)
+* **Quick Guide:**
+	+ To find the permutation, use the formula: nPr = n! / (n-r)!
+	+ To find the combination, use the formula: nCr = n! / (r!(n-r)!)
+
+**Section 9: Number Systems**
+
+* **Formulas:**
+	+ Prime factorization: Express a number as a product of its prime factors
+	+ HCF (Highest Common Factor): The largest number that divides two or more numbers
+	+ LCM (Least Common Multiple): The smallest number that is a multiple of two or more numbers
+* **Shortcuts:**
+	+ To find the prime factorization, express the number as a product of its prime factors.
+	+ To find the HCF, find the largest number that divides two or more numbers.
+	+ To find the LCM, find the smallest number that is a multiple of two or more numbers.
+* **Quick Guide:**
+	+ To find the prime factorization, use the formula: Prime factorization = Product of prime factors
+	+ To find the HCF, use the formula: HCF = Largest number that divides two or more numbers
+	+ To find the LCM, use the formula: LCM = Smallest number that is a multiple of two or more numbers
