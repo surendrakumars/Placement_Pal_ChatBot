@@ -50,14 +50,36 @@ function App() {
 
   const [resumeOptimization, setResumeOptimization] = useState(null);
 
-  const [history, setHistory] = useState([
-    {
-      role: "assistant",
-      content: "Hi! I am PlacementPal, your friendly neighborhood placement advisor. Upload your resume or ask me any question to get started!"
+  const [history, setHistory] = useState(() => {
+    try {
+      const saved = localStorage.getItem("chat_history");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to load chat history from localStorage", e);
     }
-  ]);
+    return [
+      {
+        role: "assistant",
+        content: "Hi! I am PlacementPal, your friendly neighborhood placement advisor. Upload your resume or ask me any question to get started!"
+      }
+    ];
+  });
 
   const [isPending, setIsPending] = useState(false);
+
+  // Sync chat history to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem("chat_history", JSON.stringify(history));
+    } catch (e) {
+      console.warn("Failed to save chat history to localStorage", e);
+    }
+  }, [history]);
 
   // Sync dark mode class on html tag
   useEffect(() => {
