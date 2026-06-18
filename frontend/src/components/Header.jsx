@@ -12,6 +12,7 @@ function Header({
 }) {
   const tabs = [
     { id: "chat", label: "Chat", icon: "forum" },
+    { id: "knowledge-base", label: "Knowledge Base", icon: "folder_open" },
     { id: "dashboard", label: "Resume Dashboard", icon: "dashboard" },
     { id: "roadmap", label: "Career Roadmap", icon: "route" },
     { id: "quiz", label: "Aptitude Test", icon: "edit_note" },
@@ -24,6 +25,7 @@ function Header({
   const getHeaderTitle = () => {
     switch (currentTab) {
       case "chat": return "PlacementPal Chat";
+      case "knowledge-base": return "Knowledge Base";
       case "dashboard": return "Resume Dashboard";
       case "roadmap": return "Career Roadmap";
       case "quiz": return "Aptitude Test";
