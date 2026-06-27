@@ -168,14 +168,21 @@ def extract_pdf_text(pdf_bytes: bytes) -> str:
 
     reader = PdfReader(io.BytesIO(pdf_bytes))
     pages: list[str] = []
-    for page in reader.pages:
+    raw_char_count = 0
+    
+    for idx, page in enumerate(reader.pages):
         # Use layout mode to correctly parse multi-column resumes and keep layouts intact
         try:
             text = page.extract_text(extraction_mode="layout")
-        except Exception:
+            # If layout mode returned nothing, try standard text extraction
+            if not text or not text.strip():
+                text = page.extract_text()
+        except Exception as e:
+            print(f"pypdf layout mode error on page {idx}: {e}")
             text = page.extract_text()
             
         if text:
+            raw_char_count += len(text)
             # Normalize smart/curly quotes
             text = text.replace("“", '"').replace("”", '"').replace("‘", "'").replace("’", "'")
             # Strip null bytes and non-printable control characters
@@ -188,6 +195,7 @@ def extract_pdf_text(pdf_bytes: bytes) -> str:
 
     result = "\n\n".join(pages).strip()
     if not result:
+        print(f"PDF Extraction failure: read {raw_char_count} raw characters, but cleaned result is empty.")
         raise ValueError(
             "Could not extract text from this PDF. Use a text-based PDF instead of a scanned image."
         )

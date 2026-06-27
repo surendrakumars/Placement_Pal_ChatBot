@@ -29,17 +29,21 @@ def main():
         print("To test, place a text (.txt/.md) or PDF file in the 'knowledge_base' directory and run this script again.")
         return
         
-    # We will search for a term that might be in the index
-    # We try to find a word from one of the chunks
-    test_word = "preparation"
-    for chunk in manager.chunks:
-        words = chunk["text"].split()
-        if words:
-            test_word = words[0].strip(".,;:?!'\"()[]{}")
-            if len(test_word) > 3:
-                break
+    if len(sys.argv) > 1:
+        test_word = " ".join(sys.argv[1:])
+        print(f"\nRunning custom query for: '{test_word}'")
+    else:
+        # We will search for a term that might be in the index
+        # We try to find a word from one of the chunks
+        test_word = "preparation"
+        for chunk in manager.chunks:
+            words = chunk["text"].split()
+            if words:
+                test_word = words[0].strip(".,;:?!'\"()[]{}")
+                if len(test_word) > 3:
+                    break
+        print(f"\nRunning automated test query for: '{test_word}'")
                 
-    print(f"\nRunning test query for: '{test_word}'")
     results = manager.query(test_word, top_k=2)
     print(f"Query Results found: {len(results)}")
     for i, res in enumerate(results, 1):

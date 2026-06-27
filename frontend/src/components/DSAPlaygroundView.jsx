@@ -393,6 +393,7 @@ main();`
               onChange={(e) => handleCodeChange(e.target.value)}
               onScroll={handleScroll}
               onKeyDown={handleKeyDown}
+              spellCheck="false"
               className="flex-1 h-full py-4 px-4 bg-transparent border-none focus:ring-0 text-on-surface dark:text-slate-100 resize-none overflow-y-auto leading-relaxed select-text"
               placeholder="Write your algorithmic solution here..."
               style={{ tabSize: 4 }}

@@ -70,10 +70,14 @@ def extract_pdf_text(pdf_bytes: bytes) -> str:
 
     reader = PdfReader(io.BytesIO(pdf_bytes))
     pages: list[str] = []
-    for page in reader.pages:
+    for idx, page in enumerate(reader.pages):
         try:
             text = page.extract_text(extraction_mode="layout")
-        except Exception:
+            # If layout mode returned nothing, try standard text extraction
+            if not text or not text.strip():
+                text = page.extract_text()
+        except Exception as e:
+            print(f"pypdf layout mode error on page {idx} (RAG): {e}")
             text = page.extract_text()
 
         if text:
