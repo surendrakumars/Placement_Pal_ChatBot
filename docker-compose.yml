@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: placementpal:latest
+    container_name: placementpal_container
+    ports:
+      - "${PORT:-5000}:${PORT:-5000}"
+    env_file:
+      - .env
+    volumes:
+      - ./knowledge_base:/app/knowledge_base
+      - ./saved_codes:/app/saved_codes
+    restart: unless-stopped

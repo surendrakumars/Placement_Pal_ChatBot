@@ -121,6 +121,39 @@ Open your browser and navigate to:
 
 ---
 
+## 🐳 Docker Setup (Alternative)
+
+If you prefer to run PlacementPal using Docker, a multi-stage Docker build and a Docker Compose configuration are provided. This compiles the React frontend and installs Python dependencies in isolated environments automatically.
+
+### 1. Prerequisites
+Ensure you have **Docker** and **Docker Compose** installed on your system.
+
+### 2. Configure Environment
+Ensure your `.env` file is set up in the root directory (as described in the local configuration step above).
+
+### 3. Build & Run with Docker Compose
+Start the application in detached mode:
+```bash
+docker compose up --build -d
+```
+This command will:
+* Build the React frontend production assets.
+* Spin up the Python backend server.
+* Mount local folders (`knowledge_base/` and `saved_codes/`) as persistent volumes, ensuring data persists across runs.
+* Map the application port to the port specified in your `.env` file (default is `5000`).
+
+### 4. Access the Web App
+Open your browser and navigate to:
+👉 **[http://localhost:5000](http://localhost:5000)**
+
+### 5. Stopping the Application
+To stop and clean up the containers:
+```bash
+docker compose down
+```
+
+---
+
 ## 📁 Project Structure
 
 * `main.py` - Core Python server handling API routing, file storage, mock sandbox compiler execution, and LLM orchestration. Serves React assets from `frontend/dist/`.

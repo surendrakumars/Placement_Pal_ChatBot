@@ -1,0 +1,23 @@
+# Node build artifacts
+frontend/node_modules/
+frontend/dist/
+
+# Python virtual environments & cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+env/
+
+# Data directories (persisted via volumes instead of built-in)
+knowledge_base/
+saved_codes/
+
+# Local configuration
+.env
+
+# Git files
+.git/
+.gitignore
