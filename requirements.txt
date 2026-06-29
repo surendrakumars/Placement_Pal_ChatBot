@@ -2,3 +2,4 @@ huggingface_hub
 certifi
 truststore
 pypdf
+prometheus-client

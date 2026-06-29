@@ -10,6 +10,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Any
 from urllib.parse import urlparse
 
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+
+
 
 def load_env_file(path: str = ".env") -> None:
     if not os.path.exists(path):
@@ -62,6 +65,19 @@ MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_BYTES", str(5 * 1024 * 1024)))
 
 SAVED_CODES_DIR = os.path.join(os.path.dirname(__file__), "saved_codes")
 os.makedirs(SAVED_CODES_DIR, exist_ok=True)
+
+# Prometheus metrics setup
+HTTP_REQUESTS_TOTAL = Counter(
+    "http_requests_total",
+    "Total HTTP Requests",
+    ["method", "endpoint", "status"]
+)
+
+HTTP_REQUEST_DURATION_SECONDS = Histogram(
+    "http_request_duration_seconds",
+    "HTTP request latency in seconds",
+    ["method", "endpoint"]
+)
 
 from rag import RAGManager
 rag_manager = RAGManager()
@@ -1312,13 +1328,73 @@ def load_index_html() -> str:
 
 
 class ChatHandler(BaseHTTPRequestHandler):
+    def send_response(self, code: int, message: str | None = None) -> None:
+        self.last_response_code = code
+        super().send_response(code, message)
+
+    def _normalize_path(self, method: str, path: str) -> str:
+        path = path.rstrip("/") or "/"
+        if method == "GET":
+            if path == "/" or path == "/index.html":
+                return "/"
+            if path == "/metrics":
+                return "/metrics"
+            return "/static/*"
+        elif method == "POST":
+            if path.startswith("/api/"):
+                return path
+            return "/api/*"
+        return path
+
+    def _execute_with_metrics(self, method: str, handler_func) -> None:
+        import time
+        start_time = time.time()
+        self.last_response_code = 500
+        try:
+            handler_func()
+        finally:
+            duration = time.time() - start_time
+            path = urlparse(self.path).path
+            normalized_path = self._normalize_path(method, path)
+            HTTP_REQUESTS_TOTAL.labels(
+                method=method,
+                endpoint=normalized_path,
+                status=getattr(self, "last_response_code", 500)
+            ).inc()
+            HTTP_REQUEST_DURATION_SECONDS.labels(
+                method=method,
+                endpoint=normalized_path
+            ).observe(duration)
+
     def do_OPTIONS(self) -> None:
+        self._execute_with_metrics("OPTIONS", self._do_OPTIONS_original)
+
+    def do_GET(self) -> None:
+        self._execute_with_metrics("GET", self._do_GET_original)
+
+    def do_POST(self) -> None:
+        self._execute_with_metrics("POST", self._do_POST_original)
+
+    def _do_OPTIONS_original(self) -> None:
         self.send_response(204)
         self._send_common_headers("text/plain")
         self.end_headers()
 
-    def do_GET(self) -> None:
-        clean_path = urlparse(self.path).path.lstrip("/")
+    def _do_GET_original(self) -> None:
+        path = urlparse(self.path).path
+        if path == "/metrics":
+            try:
+                metrics_data = generate_latest()
+                self.send_response(200)
+                self.send_header("Content-Type", CONTENT_TYPE_LATEST)
+                self.send_header("Content-Length", str(len(metrics_data)))
+                self.end_headers()
+                self.wfile.write(metrics_data)
+            except Exception as exc:
+                self.send_error(500, f"Error generating metrics: {str(exc)}")
+            return
+
+        clean_path = path.lstrip("/")
         if not clean_path:
             clean_path = "index.html"
 
@@ -1371,7 +1447,7 @@ class ChatHandler(BaseHTTPRequestHandler):
     def _request_path(self) -> str:
         return urlparse(self.path).path.rstrip("/") or "/"
 
-    def do_POST(self) -> None:
+    def _do_POST_original(self) -> None:
         path = self._request_path()
         if path == "/api/chat":
             self._handle_chat()
@@ -1428,6 +1504,7 @@ class ChatHandler(BaseHTTPRequestHandler):
             self._handle_rag_settings()
             return
         self._send_json(404, {"error": f"Unknown API route: {path}"})
+
 
     def _read_json_body(self) -> dict[str, Any]:
         length = int(self.headers.get("Content-Length", "0"))
